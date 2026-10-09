@@ -2,7 +2,8 @@ name: Update Chrome Version
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    # 北京时间每天凌晨 5:00（UTC 前一天 21:00）
+    - cron: '0 21 * * *'
   workflow_dispatch:
 
 permissions:

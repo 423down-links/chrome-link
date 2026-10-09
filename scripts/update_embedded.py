@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """探测 Google Chrome 全部通道版本（稳定/Beta/Dev/Canary/Win7/企业版MSI），更新 index.html 内嵌数据
 
-数据源：
+数据源（全部为 Google 官方接口/官方镜像，不依赖任何第三方仓库，可长期运行）：
 - 消费版：Google Update API（update.googleapis.com/service/update2，XML 协议）
   · x64/x86 各通道：os arch=x64 + ap=x64-{chan}/x86-{chan}
-  · arm64 仅 stable 通道有官方构建（os arch=arm64 + ap=arm64-stable）
+  · arm64 仅 stable 通道有官方构建（os arch=arm64 + ap=arm64-stable，os 须报 Win11）
   · canary 使用独立 appguid {4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}
-- 企业版 MSI：Google 官方静态直链 dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise*.msi
-  （直链始终指向最新企业版，无静态 SHA256，版本与当前 stable 同步）
-- Win7：Chrome 109 为最后支持版本（2023-01），最终 build 109.0.5414.121，
-  官方已停止提供 109 离线包直链，入口指向官方系统要求说明页
+  · 下载域名统一走 Google 官方镜像 edgedl.me.gvt1.com/edgedl/release2/chrome
+- 企业版 MSI：Google 官方镜像 edgedl.me.gvt1.com/dl/chrome/install/...，
+  SHA256 由本脚本下载完整文件自动计算；版本与 stable 同步，版本未变时复用上一次结果
+- Win7/2008R2：Chrome 109 为最后支持版本，最终 build 109.0.5414.168，
+  官方镜像直链 + 固定 SHA256（永不再更新）
 """
+import hashlib
 import json
 import re
 import urllib.request
@@ -20,7 +22,13 @@ APPID_STABLE = "{8A69D345-D564-463C-AFF1-A69D9E530F96}"
 APPID_CANARY = "{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}"
 UA = "Chrome/155.0.8059.40"
 
-# (key, appid, os_arch, ap, channel_label, arch)
+# 官方域名 → 官方镜像（gvt1 为 Google 自有 CDN，与 dl.google.com 内容一致）
+MIRROR_MAP = [
+    ("https://dl.google.com/release2/chrome/",
+     "https://edgedl.me.gvt1.com/edgedl/release2/chrome/"),
+]
+
+# (key, appid, os_arch, ap, channel_label, arch) —— 消费版
 TARGETS = [
     ("stable-x64",   APPID_STABLE, "x64",   "x64-stable",   "稳定版", "x64"),
     ("stable-x86",   APPID_STABLE, "x64",   "x86-stable",   "稳定版", "x86"),
@@ -33,36 +41,43 @@ TARGETS = [
     ("canary-x86",   APPID_CANARY, "x64",   "x86-canary",   "Canary", "x86"),
 ]
 
-# 企业版 MSI（官方静态直链，始终指向最新版）
+# 企业版 MSI（Google 官方镜像，文件名小写，直链始终指向最新版）
 ENTERPRISE_TEMPLATES = [
-    {"key": "enterprise-x64", "channel": "企业版MSI", "arch": "x64",
-     "fileName": "GoogleChromeStandaloneEnterprise64.msi",
-     "downloadURL": "https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise64.msi"},
-    {"key": "enterprise-x86", "channel": "企业版MSI", "arch": "x86",
-     "fileName": "GoogleChromeStandaloneEnterprise.msi",
-     "downloadURL": "https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise.msi"},
+    {"key": "enterprise-x64", "arch": "x64",
+     "fileName": "googlechromestandaloneenterprise64.msi",
+     "downloadURL": "https://edgedl.me.gvt1.com/dl/chrome/install/googlechromestandaloneenterprise64.msi"},
+    {"key": "enterprise-x86", "arch": "x86",
+     "fileName": "googlechromestandaloneenterprise.msi",
+     "downloadURL": "https://edgedl.me.gvt1.com/dl/chrome/install/googlechromestandaloneenterprise.msi"},
 ]
 
-# Win7 固定条目（官方最终版 109.0.5414.121，官方已停供直链）
+# Win7 固定条目（最终 build 109.0.5414.168，官方镜像直链，永不再更新）
 WIN7_ITEMS = [
     {"key": "win7-x64", "channel": "Win7/2008R2", "arch": "x64",
-     "version": "109.0.5414.121", "size": "—",
-     "fileName": "Chrome-109-x64（官方最终版，已停供直链）", "sha256": "",
-     "downloadURL": "https://support.google.com/chrome/a/answer/7100626"},
+     "version": "109.0.5414.168", "size": "89MB",
+     "fileName": "109.0.5414.168_chrome_installer.exe",
+     "sha256": "5fccbc9fb42a616c06b6bda64086d045908a8e6a23ac739baa1454dbf31b091b",
+     "downloadURL": "https://edgedl.me.gvt1.com/edgedl/release2/chrome/nvwf3mhcdg76ot6qwp75ovmh2u_109.0.5414.168/109.0.5414.168_chrome_installer.exe"},
     {"key": "win7-x86", "channel": "Win7/2008R2", "arch": "x86",
-     "version": "109.0.5414.121", "size": "—",
-     "fileName": "Chrome-109-x86（官方最终版，已停供直链）", "sha256": "",
-     "downloadURL": "https://support.google.com/chrome/a/answer/7100626"},
+     "version": "109.0.5414.168", "size": "85MB",
+     "fileName": "109.0.5414.168_chrome_installer.exe",
+     "sha256": "373b7260e2e464759b6ae4a8133cdc4145397d7b72012b6f62f5b1fa4918188f",
+     "downloadURL": "https://edgedl.me.gvt1.com/edgedl/release2/chrome/p5iizujxrjjggjfl7d4kvj5e5i_109.0.5414.168/109.0.5414.168_chrome_installer.exe"},
 ]
+
+
+def _mirror(url: str) -> str:
+    for old, new in MIRROR_MAP:
+        url = url.replace(old, new)
+    return url
 
 
 def probe(appid: str, os_arch: str, ap: str):
     """Google Update XML 探测最新版完整安装包"""
-    # arm64 通道要求 Windows 11（10.0.22631），x64/x86 用 Windows 10
     osver = "10.0.22631" if os_arch == "arm64" else "10.0.19045"
     xml_body = (
         '<?xml version="1.0" encoding="UTF-8"?>'
-        '<request protocol="3.0" version="Chrome/155.0.8059.40" ismachine="1" installsource="ondemandcheckforupdate" dedup="cr">'
+        f'<request protocol="3.0" version="{UA}" ismachine="1" installsource="ondemandcheckforupdate" dedup="cr">'
         f'<os platform="win" version="{osver}" arch="{os_arch}" sp=""/>'
         f'<app appid="{appid}" ap="{ap}" version="" lang="zh-CN" brand="GCEA" installage="1">'
         '<updatecheck/></app></request>'
@@ -83,16 +98,10 @@ def probe(appid: str, os_arch: str, ap: str):
     return {
         "version": ver.group(1),
         "size": f"{int(size.group(1)) / 1048576:.0f}MB" if size else "?",
-        "downloadURL": cb.group(1) + name.group(1),
+        "downloadURL": _mirror(cb.group(1) + name.group(1)),
         "sha256": h.group(1).lower() if h else "",
         "fileName": name.group(1),
     }
-
-
-def head_size(url: str) -> int:
-    req = urllib.request.Request(url, method="HEAD")
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return int(resp.headers.get("Content-Length", 0))
 
 
 def ver_key(v: str):
@@ -117,7 +126,41 @@ def probe_stable(appid: str, os_arch: str, ap: str, key: str):
     return best
 
 
+def download_sha256(url: str, retries: int = 3):
+    """流式下载完整文件，计算 SHA256 与字节数（带重试）"""
+    last = None
+    for _ in range(retries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            h = hashlib.sha256()
+            size = 0
+            with urllib.request.urlopen(req, timeout=60) as r:
+                while True:
+                    b = r.read(1 << 20)
+                    if not b:
+                        break
+                    h.update(b)
+                    size += len(b)
+            return h.hexdigest(), size
+        except Exception as e:
+            last = e
+    raise last
+
+
 def main():
+    with open("index.html", "r", encoding="utf-8") as f:
+        html = f.read()
+
+    # 解析上一次嵌入数据（企业版版本没变时复用其 SHA，避免每天下载 320MB）
+    old_items = {}
+    m = re.search(r"var EMBEDDED_DATA = (\{.*?\});", html, re.S)
+    if m:
+        try:
+            for it in json.loads(m.group(1)).get("items", []):
+                old_items[it["key"]] = it
+        except Exception:
+            pass
+
     items = []
     stable_version = ""
     for key, appid, os_arch, ap, label, arch in TARGETS:
@@ -133,26 +176,29 @@ def main():
         except Exception as e:
             print(f"{key:14s} 探测失败: {e}")
 
-    # 企业版 MSI：版本与 stable 同步，动态直链无静态 SHA
+    # 企业版 MSI：版本没变复用旧 SHA，版本变化则下载重新计算
     for t in ENTERPRISE_TEMPLATES:
-        try:
-            size = f"{head_size(t['downloadURL']) / 1048576:.0f}MB"
-        except Exception:
-            size = "?"
-        items.append({**t, "version": stable_version or "最新企业版", "size": size, "sha256": ""})
-        print(f"{t['key']:14s} v{stable_version or '最新':18s} {size:6s}（动态直链）")
+        old = old_items.get(t["key"])
+        if old and old.get("version") == stable_version and len(old.get("sha256", "")) == 64:
+            sha = old["sha256"]
+            size = old.get("size", "?")
+            print(f"{t['key']:14s} v{stable_version:18s} {size:6s} SHA复用")
+        else:
+            sha, nbytes = download_sha256(t["downloadURL"])
+            size = f"{nbytes / 1048576:.0f}MB"
+            print(f"{t['key']:14s} v{stable_version:18s} {size:6s} SHA自动计算 {sha[:12]}")
+        items.append({**t, "channel": "企业版MSI", "version": stable_version,
+                      "size": size, "sha256": sha})
 
     items.extend(WIN7_ITEMS)
     for w in WIN7_ITEMS:
-        print(f"{w['key']:14s} v{w['version']}（官方最终版，已停供直链）")
+        print(f"{w['key']:14s} v{w['version']:18s} {w['size']:6s} sha={w['sha256'][:12]}")
 
     new_data = {
         "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "items": items,
     }
 
-    with open("index.html", "r", encoding="utf-8") as f:
-        html = f.read()
     pattern = re.compile(r"var EMBEDDED_DATA = \{.*?\};", re.S)
     block = "var EMBEDDED_DATA = " + json.dumps(new_data, ensure_ascii=False, indent=2) + ";"
     new_html, n = pattern.subn(block, html)
