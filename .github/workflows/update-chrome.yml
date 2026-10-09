@@ -24,6 +24,7 @@ jobs:
         run: python3 scripts/update_embedded.py
 
       - name: Commit and push if changed
+        id: commit
         run: |
           git config user.name "423down"
           git config user.email "zd423@qq.com"
@@ -33,4 +34,15 @@ jobs:
           else
             git commit -m "chore: update Chrome version $(date +%F)"
             git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.commit.outputs.changed == 'true'
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: 1f5e2d11ee6dfb31343229a8e5c819b3
+          projectName: chromelnk
+          directory: .
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
