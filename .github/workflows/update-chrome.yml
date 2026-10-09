@@ -2,8 +2,10 @@ name: Update Chrome Version
 
 on:
   schedule:
-    # 目标北京时间每天凌晨 5:00（UTC 21:00）；GitHub Actions 调度普遍延迟约 15 分钟，故 cron 提前到 UTC 20:45
-    - cron: '45 20 * * *'
+    # 每小时检测官方 API；检测到更新自动 push + 部署，不再固定每天一次
+    - cron: '0 * * * *'
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -22,10 +24,12 @@ jobs:
           python-version: '3.12'
 
       - name: Run update script
+        if: github.event_name != 'push'
         run: python3 scripts/update_embedded.py
 
       - name: Commit and push if changed
         id: commit
+        if: github.event_name != 'push'
         run: |
           git config user.name "423down"
           git config user.email "zd423@qq.com"
@@ -39,7 +43,8 @@ jobs:
           fi
 
       - name: Deploy to Cloudflare Pages
-        if: steps.commit.outputs.changed == 'true'
+        # 检测到更新（schedule/dispatch）或代码/数据变更（push）时都立即部署
+        if: github.event_name == 'push' || steps.commit.outputs.changed == 'true'
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
