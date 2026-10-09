@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Chrome 离线安装包下载</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
+    background: #14161c;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 1.7em;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ea4335, #fbbc04, #34a853, #4285f4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.85em;
+    margin-bottom: 8px;
+  }
+  .version-info {
+    text-align: center;
+    color: #34a853;
+    font-size: 0.85em;
+    margin-bottom: 16px;
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 700px) {
+    .cards { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: #1e2130;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2d3144;
+    transition: border-color 0.3s;
+  }
+  .card:hover { border-color: #4285f4; }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 1.15em;
+    font-weight: 600;
+    color: #fff;
+  }
+  .badge {
+    font-size: 0.7em;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: #2d3144;
+    color: #34a853;
+  }
+  .field { margin-bottom: 10px; }
+  .field-label {
+    font-size: 0.72em;
+    color: #888;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .field-value {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.72em;
+    background: #0d0f14;
+    padding: 6px 8px;
+    border-radius: 6px;
+    word-break: break-all;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .field-value a {
+    color: #34a853;
+    text-decoration: none;
+    flex: 1;
+  }
+  .field-value a:hover { text-decoration: underline; }
+  .field-value span { flex: 1; }
+  .copy-btn {
+    background: none;
+    border: 1px solid #2d3144;
+    color: #888;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { border-color: #4285f4; color: #4285f4; }
+  .copy-btn.copied { border-color: #34a853; color: #34a853; }
+  .download-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-top: 12px;
+    transition: opacity 0.2s;
+  }
+  .download-btn:hover { opacity: 0.9; }
+  .download-btn .sub {
+    display: block;
+    font-size: 0.75em;
+    font-weight: normal;
+    opacity: 0.85;
+    margin-top: 3px;
+  }
+  .note {
+    background: #2d3144;
+    border-left: 3px solid #34a853;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 20px;
+    font-size: 0.82em;
+    color: #aaa;
+    line-height: 1.6;
+  }
+  .note strong { color: #34a853; }
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.75em;
+    color: #555;
+    line-height: 1.8;
+  }
+  .footer a { color: #34a853; text-decoration: none; }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3144;
+    color: #34a853;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Google Chrome 离线安装包</h1>
+  <p class="subtitle">官方 Google Update 直链 · 完整离线安装包 · 支持 IDM 下载</p>
+  <p class="version-info" id="versionInfo">正在获取最新版本...</p>
+
+  <div class="note">
+    <strong>说明：</strong>数据来自 Google Update 官方 API（update.googleapis.com），版本号自动更新。
+    下载链接为 Google 官方 CDN 直链（dl.google.com），可直接用浏览器或 IDM 下载完整离线安装包，无需登录。
+  </div>
+
+  <div class="cards">
+    <!-- Windows x64 -->
+    <div class="card" id="card-x64">
+      <div class="card-header">
+        <span class="card-title">Windows x64</span>
+        <span class="badge" id="badge-x64">稳定版</span>
+      </div>
+      <div class="field">
+        <div class="field-label">适用系统</div>
+        <div class="field-value"><span>Win10 / Win11 64位</span></div>
+      </div>
+      <div class="field">
+        <div class="field-label">版本 / 大小</div>
+        <div class="field-value"><span id="meta-x64">-</span></div>
+      </div>
+      <div class="field">
+        <div class="field-label">官方直链（支持IDM）</div>
+        <div class="field-value">
+          <a href="#" target="_blank" id="link-x64">-</a>
+          <button class="copy-btn" onclick="copyText('link-x64', this)">复制</button>
+        </div>
+      </div>
+      <a href="#" target="_blank" class="download-btn" id="dl-x64">
+        立即下载（离线包）
+        <span class="sub" id="dl-size-x64"></span>
+      </a>
+    </div>
+
+    <!-- Windows ARM64 -->
+    <div class="card" id="card-arm64">
+      <div class="card-header">
+        <span class="card-title">Windows ARM64</span>
+        <span class="badge" id="badge-arm64">稳定版</span>
+      </div>
+      <div class="field">
+        <div class="field-label">适用系统</div>
+        <div class="field-value"><span>Win11 ARM 设备（骁龙/Surface）</span></div>
+      </div>
+      <div class="field">
+        <div class="field-label">版本 / 大小</div>
+        <div class="field-value"><span id="meta-arm64">-</span></div>
+      </div>
+      <div class="field">
+        <div class="field-label">官方直链（支持IDM）</div>
+        <div class="field-value">
+          <a href="#" target="_blank" id="link-arm64">-</a>
+          <button class="copy-btn" onclick="copyText('link-arm64', this)">复制</button>
+        </div>
+      </div>
+      <a href="#" target="_blank" class="download-btn" id="dl-arm64">
+        立即下载（离线包）
+        <span class="sub" id="dl-size-arm64"></span>
+      </a>
+    </div>
+  </div>
+
+  <p class="footer" id="footer">
+    数据来源：<a href="https://update.googleapis.com" target="_blank">Google Update API</a> |
+    版本自动更新 · 由 AI 云自动化维护<br>
+    <a href="https://www.423down.com" target="_blank">423down.com</a>
+  </p>
+</div>
+
+<div class="toast" id="toast">已复制到剪贴板</div>
+
+<script>
+// 嵌入兜底数据（由 GitHub Actions 定期更新，页面加载失败时使用）
+var EMBEDDED_DATA = {
+  "checked_at": "2026-10-09 12:10",
+  "x64": {
+    "version": "155.0.8059.40",
+    "size": "498MB",
+    "downloadURL": "https://dl.google.com/release2/chrome/adeicfs34nqhzmry2l2sdlpo7l2q_155.0.8059.40/155.0.8059.40_chrome_installer_uncompressed.exe"
+  },
+  "arm64": {
+    "version": "155.0.8059.40",
+    "size": "474MB",
+    "downloadURL": "https://dl.google.com/release2/chrome/ac6omupkuaxj37onz6gn45r5igna_155.0.8059.40/155.0.8059.40_chrome_installer_uncompressed.exe"
+  }
+};
+
+function copyText(id, btn) {
+  var el = document.getElementById(id);
+  var text = el.tagName === 'A' ? el.href : el.textContent;
+  if (!text || text === '-' || text === '加载中...') return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      if (btn) { btn.classList.add('copied'); setTimeout(function(){ btn.classList.remove('copied'); }, 1500); }
+      showToast('已复制到剪贴板');
+    }).catch(function() { fallbackCopy(text, btn); });
+  } else {
+    fallbackCopy(text, btn);
+  }
+}
+
+function fallbackCopy(text, btn) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  if (btn) { btn.classList.add('copied'); setTimeout(function(){ btn.classList.remove('copied'); }, 1500); }
+  showToast('已复制到剪贴板');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+function renderData(data) {
+  var types = ['x64', 'arm64'];
+  for (var i = 0; i < types.length; i++) {
+    var type = types[i];
+    var card = data[type];
+    document.getElementById('meta-' + type).textContent = 'v' + card.version + ' / ' + card.size;
+    var linkEl = document.getElementById('link-' + type);
+    linkEl.href = card.downloadURL;
+    linkEl.textContent = card.downloadURL;
+    var dlEl = document.getElementById('dl-' + type);
+    dlEl.href = card.downloadURL;
+    document.getElementById('dl-size-' + type).textContent = '约 ' + card.size + ' · 完整离线包 · 官方直链';
+    document.getElementById('badge-' + type).textContent = '稳定版 ' + card.version;
+  }
+  document.getElementById('versionInfo').textContent = '最新稳定版：v' + data.x64.version + ' （数据更新 ' + data.checked_at + '）';
+}
+
+// 先用嵌入数据渲染
+renderData(EMBEDDED_DATA);
+
+// 尝试通过 Google Update API 获取最新版（可能被 CORS 拦截，失败则用嵌入数据）
+function fetchLatest() {
+  var archs = ['x64', 'arm64'];
+  var pending = archs.length;
+  archs.forEach(function(arch) {
+    var xml = '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<request protocol="3.0" version="1.3.36.155">' +
+      '<os version="10.0.22631" platform="win" sp="" arch="' + arch + '"/>' +
+      '<app appid="{8A69D345-D564-463C-AFF1-A69D9E530F96}" version="" nextversion="" lang="" brand="" client="" ap="' + arch + '-stable">' +
+      '<updatecheck target="" targetchannel=""/></app></request>';
+    fetch('https://update.googleapis.com/service/update2', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/xml' },
+      body: xml
+    }).then(function(r) { return r.text(); }).then(function(text) {
+      var ver = text.match(/<manifest version="([^"]+)"/);
+      var code = text.match(/<url codebase="(https:\/\/dl\.google\.com\/[^"]+)"/);
+      var pkg = text.match(/name="([^"]+\.exe)"/);
+      var size = text.match(/required="true" size="(\d+)"/);
+      if (ver && code && pkg) {
+        var dl = code[1] + pkg[1];
+        var sz = size ? (parseInt(size[1]) / 1048576).toFixed(0) + 'MB' : '?';
+        EMBEDDED_DATA[arch] = { version: ver[1], size: sz, downloadURL: dl };
+      }
+    }).catch(function() {}).finally(function() {
+      pending--;
+      if (pending === 0) {
+        EMBEDDED_DATA.checked_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        renderData(EMBEDDED_DATA);
+      }
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', fetchLatest);
+} else {
+  fetchLatest();
+}
+</script>
+</body>
+</html>

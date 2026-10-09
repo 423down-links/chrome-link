@@ -1,0 +1,36 @@
+name: Update Chrome Version
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run update script
+        run: python3 scripts/update_embedded.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "423down"
+          git config user.email "zd423@qq.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "无版本更新，跳过推送"
+          else
+            git commit -m "chore: update Chrome version $(date +%F)"
+            git push
+          fi
