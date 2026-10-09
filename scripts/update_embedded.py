@@ -12,8 +12,10 @@
 - Win7/2008R2：Chrome 109 为最后支持版本，最终 build 109.0.5414.168，
   官方镜像直链 + 固定 SHA256（永不再更新）
 """
+import email.utils as eut
 import hashlib
 import json
+import os
 import re
 import urllib.request
 from datetime import datetime, timezone
@@ -111,7 +113,7 @@ def ver_key(v: str):
 def probe_stable(appid: str, os_arch: str, ap: str, key: str):
     """多次探测取最新稳定包：过滤异常大小（标准 uncompressed 包 200~600MB），版本号取最高"""
     best = None
-    for _ in range(3):
+    for _ in range(6):  # 重试 6 次：beta x64 偶发 717MB 多语言旧变体，多试取正常最高版
         try:
             r = probe(appid, os_arch, ap)
             size_mb = int(r["size"].rstrip("MB"))
@@ -147,6 +149,50 @@ def download_sha256(url: str, retries: int = 3):
     raise last
 
 
+def head_last_modified(url: str) -> str:
+    """HEAD 安装包取 Last-Modified（官方文件时间），返回带 Z 的 UTC ISO"""
+    for _ in range(3):
+        try:
+            req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=25) as r:
+                lm = r.headers.get("Last-Modified")
+                if lm:
+                    return eut.parsedate_to_datetime(lm).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        except Exception:
+            continue
+    return ""
+
+
+VH_PLATFORM = {"x64": "win64", "x86": "win", "arm64": "winarm64"}
+VH_CHANNEL = {"稳定版": "stable", "Beta": "beta", "Dev": "dev", "Canary": "canary"}
+
+
+def versionhistory_published(channel: str, arch: str, version: str) -> str:
+    """Chrome 官方 Version History API：取该版本 eventTime（GitHub Actions 完整公网可达）。
+    本地沙箱代理白名单外会超时，由调用方回退 Last-Modified。"""
+    if os.environ.get("SKIP_VH"):  # 本地沙箱代理白名单外，跳过（GitHub Actions 不设此变量）
+        return ""
+    plat = VH_PLATFORM.get(arch)
+    ch = VH_CHANNEL.get(channel)
+    if not plat or not ch:
+        return ""
+    url = (f"https://versionhistory.googleapis.com/v1/chrome/platforms/{plat}/channels/{ch}"
+           f"/releases?order_by=starttime%20desc&page_size=15")
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=25) as r:
+            data = json.loads(r.read().decode())
+        for rel in data.get("releases", []):
+            if rel.get("version") == version:
+                ev = rel.get("eventTime")
+                if ev and not ev.endswith("Z"):
+                    ev += "Z"
+                return ev
+    except Exception:
+        return ""
+    return ""
+
+
 def main():
     with open("index.html", "r", encoding="utf-8") as f:
         html = f.read()
@@ -169,8 +215,11 @@ def main():
             info["key"] = key
             info["channel"] = label
             info["arch"] = arch
+            # 官方发布时间：Version History 优先，失败回退文件 Last-Modified
+            info["published"] = versionhistory_published(label, arch, info["version"]) \
+                or head_last_modified(info["downloadURL"])
             items.append(info)
-            print(f"{key:14s} v{info['version']:18s} {info['size']:6s} sha={info['sha256'][:12] or '-':12s} {info['fileName'][:45]}")
+            print(f"{key:14s} v{info['version']:18s} {info['size']:6s} pub={info['published']}")
             if key == "stable-x64":
                 stable_version = info["version"]
         except Exception as e:
@@ -187,12 +236,18 @@ def main():
             sha, nbytes = download_sha256(t["downloadURL"])
             size = f"{nbytes / 1048576:.0f}MB"
             print(f"{t['key']:14s} v{stable_version:18s} {size:6s} SHA自动计算 {sha[:12]}")
+        # 企业版随 stable 发布：用 stable 官方时间，失败回退 Last-Modified
+        pub = versionhistory_published("稳定版", t["arch"], stable_version) \
+            or head_last_modified(t["downloadURL"])
         items.append({**t, "channel": "企业版MSI", "version": stable_version,
-                      "size": size, "sha256": sha})
+                      "size": size, "sha256": sha, "published": pub})
 
+    for w in WIN7_ITEMS:
+        if not w.get("published"):  # Win7 终版：取官方文件 Last-Modified
+            w["published"] = head_last_modified(w["downloadURL"])
     items.extend(WIN7_ITEMS)
     for w in WIN7_ITEMS:
-        print(f"{w['key']:14s} v{w['version']:18s} {w['size']:6s} sha={w['sha256'][:12]}")
+        print(f"{w['key']:14s} v{w['version']:18s} {w['size']:6s} pub={w['published']}")
 
     new_data = {
         "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
