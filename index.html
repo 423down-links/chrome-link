@@ -8,16 +8,16 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
-    background: #14161c;
+    background: #10151f;
     color: #e0e0e0;
     min-height: 100vh;
-    padding: 20px;
+    padding: 16px;
   }
-  .container { max-width: 1000px; margin: 0 auto; }
+  .container { max-width: 1200px; margin: 0 auto; }
   h1 {
     text-align: center;
-    font-size: 1.7em;
-    margin-bottom: 8px;
+    font-size: 1.5em;
+    margin-bottom: 6px;
     background: linear-gradient(135deg, #ea4335, #fbbc04, #34a853, #4285f4);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -26,142 +26,101 @@
   .subtitle {
     text-align: center;
     color: #888;
-    font-size: 0.85em;
+    font-size: 0.8em;
     margin-bottom: 8px;
   }
   .version-info {
     text-align: center;
-    color: #34a853;
-    font-size: 0.85em;
-    margin-bottom: 16px;
+    color: #4285f4;
+    font-size: 0.78em;
+    margin-bottom: 12px;
     font-family: 'Consolas', 'Monaco', monospace;
   }
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-  @media (max-width: 700px) {
-    .cards { grid-template-columns: 1fr; }
-  }
-  .card {
-    background: #1e2130;
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid #2d3144;
-    transition: border-color 0.3s;
-  }
-  .card:hover { border-color: #4285f4; }
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-  .card-title {
-    font-size: 1.15em;
-    font-weight: 600;
-    color: #fff;
-  }
-  .badge {
-    font-size: 0.7em;
-    padding: 3px 8px;
+  .table-wrap {
+    background: #16213e;
+    border: 1px solid #1e3a5f;
     border-radius: 10px;
-    background: #2d3144;
-    color: #34a853;
+    overflow-x: auto;
   }
-  .field { margin-bottom: 10px; }
-  .field-label {
-    font-size: 0.72em;
-    color: #888;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  table { width: 100%; border-collapse: collapse; font-size: 0.76em; }
+  thead th {
+    background: #1b2a4d;
+    color: #4285f4;
+    text-align: left;
+    padding: 8px 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
   }
-  .field-value {
+  tbody td {
+    padding: 7px 10px;
+    border-top: 1px solid #14203c;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  tbody tr:hover { background: #1a2b4d; }
+  .ch-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 9px;
+    font-size: 0.9em;
+    background: #1e3a5f;
+    color: #4285f4;
+  }
+  .ch-stable { background: #0d3b2e; color: #00e5a0; }
+  .ch-beta { background: #3b2e0d; color: #ffc107; }
+  .ch-dev { background: #3b1a0d; color: #ff9800; }
+  .ch-canary { background: #3b0d1e; color: #ff4d6d; }
+  .ch-win7 { background: #1e2e3b; color: #8fb3d9; }
+  .ch-enterprise { background: #2e1e3b; color: #b388ff; }
+  .arch { color: #aaa; font-family: 'Consolas', 'Monaco', monospace; }
+  .ver { color: #fff; font-family: 'Consolas', 'Monaco', monospace; }
+  .size { color: #aaa; font-family: 'Consolas', 'Monaco', monospace; }
+  .fname { color: #c8d6e5; font-family: 'Consolas', 'Monaco', monospace; word-break: break-all; }
+  .sha {
     font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 0.72em;
-    background: #0d0f14;
-    padding: 6px 8px;
-    border-radius: 6px;
-    word-break: break-all;
-    color: #e0e0e0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 6px;
+    color: #9aa7b8;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
-  .field-value a {
-    color: #34a853;
-    text-decoration: none;
-    flex: 1;
-  }
-  .field-value a:hover { text-decoration: underline; }
-  .field-value span { flex: 1; }
+  .sha .hash { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
   .copy-btn {
     background: none;
-    border: 1px solid #2d3144;
+    border: 1px solid #1e3a5f;
     color: #888;
-    padding: 2px 6px;
+    padding: 1px 6px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.85em;
-    flex-shrink: 0;
     transition: all 0.2s;
   }
   .copy-btn:hover { border-color: #4285f4; color: #4285f4; }
   .copy-btn.copied { border-color: #34a853; color: #34a853; }
-  .download-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background: linear-gradient(135deg, #4285f4, #34a853);
-    color: #fff;
+  .dl-link {
+    color: #4285f4;
     text-decoration: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 0.95em;
     font-weight: 600;
-    margin-top: 12px;
-    transition: opacity 0.2s;
   }
-  .download-btn:hover { opacity: 0.9; }
-  .download-btn .sub {
-    display: block;
-    font-size: 0.75em;
-    font-weight: normal;
-    opacity: 0.85;
-    margin-top: 3px;
-  }
-  .note {
-    background: #2d3144;
-    border-left: 3px solid #34a853;
-    padding: 12px 16px;
-    border-radius: 0 8px 8px 0;
-    margin-bottom: 20px;
-    font-size: 0.82em;
-    color: #aaa;
-    line-height: 1.6;
-  }
-  .note strong { color: #34a853; }
+  .dl-link:hover { text-decoration: underline; }
   .footer {
     text-align: center;
-    margin-top: 24px;
-    font-size: 0.75em;
+    margin-top: 14px;
+    font-size: 0.74em;
     color: #555;
-    line-height: 1.8;
   }
-  .footer a { color: #34a853; text-decoration: none; }
+  .footer a { color: #4285f4; text-decoration: none; }
   .toast {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #2d3144;
-    color: #34a853;
-    padding: 10px 24px;
+    background: #1e3a5f;
+    color: #4285f4;
+    padding: 8px 20px;
     border-radius: 8px;
-    font-size: 0.9em;
+    font-size: 0.85em;
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
@@ -172,74 +131,28 @@
 <body>
 <div class="container">
   <h1>Google Chrome 离线安装包</h1>
-  <p class="subtitle">官方 Google Update 直链 · 完整离线安装包 · 支持 IDM 下载</p>
-  <p class="version-info" id="versionInfo">正在获取最新版本...</p>
+  <p class="subtitle">官方 Google Update API 直链 · 全通道完整离线安装包 · 支持 IDM 下载</p>
+  <p class="version-info" id="versionInfo">正在获取版本数据...</p>
 
-  <div class="note">
-    <strong>说明：</strong>数据来自 Google Update 官方 API（update.googleapis.com），版本号自动更新。
-    下载链接为 Google 官方 CDN 直链（dl.google.com），可直接用浏览器或 IDM 下载完整离线安装包，无需登录。
-  </div>
-
-  <div class="cards">
-    <!-- Windows x64 -->
-    <div class="card" id="card-x64">
-      <div class="card-header">
-        <span class="card-title">Windows x64</span>
-        <span class="badge" id="badge-x64">稳定版</span>
-      </div>
-      <div class="field">
-        <div class="field-label">适用系统</div>
-        <div class="field-value"><span>Win10 / Win11 64位</span></div>
-      </div>
-      <div class="field">
-        <div class="field-label">版本 / 大小</div>
-        <div class="field-value"><span id="meta-x64">-</span></div>
-      </div>
-      <div class="field">
-        <div class="field-label">官方直链（支持IDM）</div>
-        <div class="field-value">
-          <a href="#" target="_blank" id="link-x64">-</a>
-          <button class="copy-btn" onclick="copyText('link-x64', this)">复制</button>
-        </div>
-      </div>
-      <a href="#" target="_blank" class="download-btn" id="dl-x64">
-        立即下载（离线包）
-        <span class="sub" id="dl-size-x64"></span>
-      </a>
-    </div>
-
-    <!-- Windows ARM64 -->
-    <div class="card" id="card-arm64">
-      <div class="card-header">
-        <span class="card-title">Windows ARM64</span>
-        <span class="badge" id="badge-arm64">稳定版</span>
-      </div>
-      <div class="field">
-        <div class="field-label">适用系统</div>
-        <div class="field-value"><span>Win11 ARM 设备（骁龙/Surface）</span></div>
-      </div>
-      <div class="field">
-        <div class="field-label">版本 / 大小</div>
-        <div class="field-value"><span id="meta-arm64">-</span></div>
-      </div>
-      <div class="field">
-        <div class="field-label">官方直链（支持IDM）</div>
-        <div class="field-value">
-          <a href="#" target="_blank" id="link-arm64">-</a>
-          <button class="copy-btn" onclick="copyText('link-arm64', this)">复制</button>
-        </div>
-      </div>
-      <a href="#" target="_blank" class="download-btn" id="dl-arm64">
-        立即下载（离线包）
-        <span class="sub" id="dl-size-arm64"></span>
-      </a>
-    </div>
+  <div class="table-wrap">
+    <table id="verTable">
+      <thead>
+        <tr>
+          <th>通道</th>
+          <th>架构</th>
+          <th>版本号</th>
+          <th>大小</th>
+          <th>文件名称</th>
+          <th>校验值 SHA256</th>
+          <th>下载</th>
+        </tr>
+      </thead>
+      <tbody id="verBody"></tbody>
+    </table>
   </div>
 
   <p class="footer" id="footer">
-    数据来源：<a href="https://update.googleapis.com" target="_blank">Google Update API</a> |
-    版本自动更新 · 由 AI 云自动化维护<br>
-    <a href="https://www.423down.com" target="_blank">423down.com</a>
+    数据来源：<a href="https://update.googleapis.com/service/update2" target="_blank">Google Update API</a> | 版本自动更新 · 由 AI 云自动化维护 · <a href="https://www.423down.com" target="_blank">423down</a>
   </p>
 </div>
 
@@ -248,27 +161,169 @@
 <script>
 // 嵌入兜底数据（由 GitHub Actions 定期更新，页面加载失败时使用）
 var EMBEDDED_DATA = {
-  "checked_at": "2026-10-09 12:10",
-  "x64": {
-    "version": "155.0.8059.40",
-    "size": "498MB",
-    "downloadURL": "https://dl.google.com/release2/chrome/adeicfs34nqhzmry2l2sdlpo7l2q_155.0.8059.40/155.0.8059.40_chrome_installer_uncompressed.exe"
-  },
-  "arm64": {
-    "version": "155.0.8059.40",
-    "size": "474MB",
-    "downloadURL": "https://dl.google.com/release2/chrome/ac6omupkuaxj37onz6gn45r5igna_155.0.8059.40/155.0.8059.40_chrome_installer_uncompressed.exe"
-  }
+  "checked_at": "2026-10-09T06:35:02Z",
+  "items": [
+    {
+      "version": "155.0.8059.40",
+      "size": "498MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/adeicfs34nqhzmry2l2sdlpo7l2q_155.0.8059.40/155.0.8059.40_chrome_installer_uncompressed.exe",
+      "sha256": "c43d400e13d421f43ea3bba7e502004f2fe428e5679b32975e3a343bc1d97f06",
+      "fileName": "155.0.8059.40_chrome_installer_uncompressed.exe",
+      "key": "stable-x64",
+      "channel": "稳定版",
+      "arch": "x64"
+    },
+    {
+      "version": "155.0.8059.40",
+      "size": "423MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/acebtw7pmgyxqsd5b653vx6idjoa_155.0.8059.40/155.0.8059.40_chrome_installer_uncompressed.exe",
+      "sha256": "f586ddb44ced63c62759a9bfd44fa040c9bd9fa952cad56d688d6b25b2b75f24",
+      "fileName": "155.0.8059.40_chrome_installer_uncompressed.exe",
+      "key": "stable-x86",
+      "channel": "稳定版",
+      "arch": "x86"
+    },
+    {
+      "version": "155.0.8059.40",
+      "size": "474MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/ac6omupkuaxj37onz6gn45r5igna_155.0.8059.40/155.0.8059.40_chrome_installer_uncompressed.exe",
+      "sha256": "db0a36c12f8e74289b4d57ace1a04dd870cb470c531d7a29da0128eee3aa3ee6",
+      "fileName": "155.0.8059.40_chrome_installer_uncompressed.exe",
+      "key": "stable-arm64",
+      "channel": "稳定版",
+      "arch": "arm64"
+    },
+    {
+      "version": "156.0.8078.17",
+      "size": "501MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/acddklhek2rnbpebk7h5gq6mwp5q_156.0.8078.17/156.0.8078.17_chrome_installer_uncompressed.exe",
+      "sha256": "7b3d80c1ad35eddf560774eaff9fde1ef61cfaf716608abb19f5464b9057f56d",
+      "fileName": "156.0.8078.17_chrome_installer_uncompressed.exe",
+      "key": "beta-x64",
+      "channel": "Beta",
+      "arch": "x64"
+    },
+    {
+      "version": "156.0.8078.17",
+      "size": "427MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/ac6mnoou26n3a32zjtlsraz76qhq_156.0.8078.17/156.0.8078.17_chrome_installer_uncompressed.exe",
+      "sha256": "c692e9fc85111999a3ba5779b03842e94fc5eaab0b839ece0a709a49bb16b8ad",
+      "fileName": "156.0.8078.17_chrome_installer_uncompressed.exe",
+      "key": "beta-x86",
+      "channel": "Beta",
+      "arch": "x86"
+    },
+    {
+      "version": "157.0.8081.0",
+      "size": "502MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/iiqteoqwgj4i7diae7pnwx5tca_157.0.8081.0/157.0.8081.0_chrome_installer_uncompressed.exe",
+      "sha256": "b0e57daa0c194d9617cf11480990eadbaef203c541c94741555e132180871b50",
+      "fileName": "157.0.8081.0_chrome_installer_uncompressed.exe",
+      "key": "dev-x64",
+      "channel": "Dev",
+      "arch": "x64"
+    },
+    {
+      "version": "157.0.8081.0",
+      "size": "428MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/b6g4s6cjavvsmowuojmqta23ym_157.0.8081.0/157.0.8081.0_chrome_installer_uncompressed.exe",
+      "sha256": "f5fbe6512982fa6032f5ebab95354cfc95dbd90aa52105d24e2948d2cef6eeb2",
+      "fileName": "157.0.8081.0_chrome_installer_uncompressed.exe",
+      "key": "dev-x86",
+      "channel": "Dev",
+      "arch": "x86"
+    },
+    {
+      "version": "157.0.8093.0",
+      "size": "503MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/hy7nkuciib7n2to7qhorcezy34_157.0.8093.0/157.0.8093.0_chrome_installer_uncompressed.exe",
+      "sha256": "6859057768aff664f6d81e8c32715cc7b88bf18717ff0cc9be84b86bb10b2925",
+      "fileName": "157.0.8093.0_chrome_installer_uncompressed.exe",
+      "key": "canary-x64",
+      "channel": "Canary",
+      "arch": "x64"
+    },
+    {
+      "version": "157.0.8093.0",
+      "size": "432MB",
+      "downloadURL": "https://dl.google.com/release2/chrome/ew2cb5lmbqsievtarmelhf7lny_157.0.8093.0/157.0.8093.0_chrome_installer_uncompressed.exe",
+      "sha256": "22f5c131fe170b4d0cbda09178db46fa7c96b4e53e169468a769a55a57633ba3",
+      "fileName": "157.0.8093.0_chrome_installer_uncompressed.exe",
+      "key": "canary-x86",
+      "channel": "Canary",
+      "arch": "x86"
+    },
+    {
+      "key": "enterprise-x64",
+      "channel": "企业版MSI",
+      "arch": "x64",
+      "fileName": "GoogleChromeStandaloneEnterprise64.msi",
+      "downloadURL": "https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise64.msi",
+      "version": "155.0.8059.40",
+      "size": "162MB",
+      "sha256": ""
+    },
+    {
+      "key": "enterprise-x86",
+      "channel": "企业版MSI",
+      "arch": "x86",
+      "fileName": "GoogleChromeStandaloneEnterprise.msi",
+      "downloadURL": "https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise.msi",
+      "version": "155.0.8059.40",
+      "size": "152MB",
+      "sha256": ""
+    },
+    {
+      "key": "win7-x64",
+      "channel": "Win7/2008R2",
+      "arch": "x64",
+      "version": "109.0.5414.121",
+      "size": "—",
+      "fileName": "Chrome-109-x64（官方最终版，已停供直链）",
+      "sha256": "",
+      "downloadURL": "https://support.google.com/chrome/a/answer/7100626"
+    },
+    {
+      "key": "win7-x86",
+      "channel": "Win7/2008R2",
+      "arch": "x86",
+      "version": "109.0.5414.121",
+      "size": "—",
+      "fileName": "Chrome-109-x86（官方最终版，已停供直链）",
+      "sha256": "",
+      "downloadURL": "https://support.google.com/chrome/a/answer/7100626"
+    }
+  ]
 };
+
+// 通道 → 样式 class
+function chClass(channel) {
+  var m = { '稳定版': 'ch-stable', 'Beta': 'ch-beta', 'Dev': 'ch-dev', 'Canary': 'ch-canary', 'Win7/2008R2': 'ch-win7', '企业版MSI': 'ch-enterprise' };
+  return m[channel] || 'ch-badge';
+}
+
+// 前端实时探测列表（Google Update XML，与后端 update_embedded.py 保持一致）
+// canary 使用独立 appguid；arm64 仅 stable 通道有官方构建
+var APPIDS = [
+  { key: 'stable-x64',   appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x64-stable',   channel: '稳定版', arch: 'x64'   },
+  { key: 'stable-x86',   appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x86-stable',   channel: '稳定版', arch: 'x86'   },
+  { key: 'stable-arm64', appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'arm64', ap: 'arm64-stable', channel: '稳定版', arch: 'arm64' },
+  { key: 'beta-x64',     appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x64-beta',     channel: 'Beta',     arch: 'x64'   },
+  { key: 'beta-x86',     appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x86-beta',     channel: 'Beta',     arch: 'x86'   },
+  { key: 'dev-x64',      appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x64-dev',      channel: 'Dev',      arch: 'x64'   },
+  { key: 'dev-x86',      appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x86-dev',      channel: 'Dev',      arch: 'x86'   },
+  { key: 'canary-x64',   appid: '{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}', osarch: 'x64',   ap: 'x64-canary',   channel: 'Canary',   arch: 'x64'   },
+  { key: 'canary-x86',   appid: '{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}', osarch: 'x64',   ap: 'x86-canary',   channel: 'Canary',   arch: 'x86'   }
+];
 
 function copyText(id, btn) {
   var el = document.getElementById(id);
-  var text = el.tagName === 'A' ? el.href : el.textContent;
-  if (!text || text === '-' || text === '加载中...') return;
+  if (!el || !el.dataset.sha) return;
+  var text = el.dataset.sha;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(function() {
       if (btn) { btn.classList.add('copied'); setTimeout(function(){ btn.classList.remove('copied'); }, 1500); }
-      showToast('已复制到剪贴板');
+      showToast('SHA256 已复制');
     }).catch(function() { fallbackCopy(text, btn); });
   } else {
     fallbackCopy(text, btn);
@@ -283,7 +338,7 @@ function fallbackCopy(text, btn) {
   try { document.execCommand('copy'); } catch(e) {}
   document.body.removeChild(ta);
   if (btn) { btn.classList.add('copied'); setTimeout(function(){ btn.classList.remove('copied'); }, 1500); }
-  showToast('已复制到剪贴板');
+  showToast('SHA256 已复制');
 }
 
 function showToast(msg) {
@@ -293,55 +348,88 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 
+// UTC-4 显示（固定偏移，对应美东夏令时）
+function fmtUTC4(isoStr) {
+  var t = new Date(isoStr);
+  if (isNaN(t.getTime())) return isoStr;
+  var s = new Date(t.getTime() - 4 * 3600 * 1000).toISOString().slice(0, 16).replace('T', ' ');
+  return s + ' (UTC-4)';
+}
+
 function renderData(data) {
-  var types = ['x64', 'arm64'];
-  for (var i = 0; i < types.length; i++) {
-    var type = types[i];
-    var card = data[type];
-    document.getElementById('meta-' + type).textContent = 'v' + card.version + ' / ' + card.size;
-    var linkEl = document.getElementById('link-' + type);
-    linkEl.href = card.downloadURL;
-    linkEl.textContent = card.downloadURL;
-    var dlEl = document.getElementById('dl-' + type);
-    dlEl.href = card.downloadURL;
-    document.getElementById('dl-size-' + type).textContent = '约 ' + card.size + ' · 完整离线包 · 官方直链';
-    document.getElementById('badge-' + type).textContent = '稳定版 ' + card.version;
+  var items = (data && data.items) || [];
+  var body = document.getElementById('verBody');
+  body.innerHTML = '';
+  items.forEach(function(item) {
+    var tr = document.createElement('tr');
+    var shaId = 'sha-' + item.key;
+    var shaVal = item.sha256 || '';
+    var shaCell;
+    if (shaVal) {
+      var shaShort = shaVal.slice(0, 16) + '…';
+      shaCell = '<span class="sha"><span class="hash" id="' + shaId + '" data-sha="' + shaVal + '" title="' + shaVal + '">' + shaShort + '</span>' +
+        '<button class="copy-btn" onclick="copyText(\'' + shaId + '\', this)">复制</button></span>';
+    } else {
+      shaCell = '<span class="sha" style="color:#555">-</span>';
+    }
+    tr.innerHTML =
+      '<td><span class="ch-badge ' + chClass(item.channel) + '">' + item.channel + '</span></td>' +
+      '<td class="arch">' + item.arch + '</td>' +
+      '<td class="ver">' + item.version + '</td>' +
+      '<td class="size">' + item.size + '</td>' +
+      '<td class="fname">' + item.fileName + '</td>' +
+      '<td>' + shaCell + '</td>' +
+      '<td><a class="dl-link" href="' + item.downloadURL + '" target="_blank" rel="noopener">下载 ↓</a></td>';
+    body.appendChild(tr);
+  });
+  if (data && data.checked_at) {
+    document.getElementById('versionInfo').textContent = '数据更新：' + fmtUTC4(data.checked_at) + ' · 共 ' + items.length + ' 个版本';
   }
-  document.getElementById('versionInfo').textContent = '最新稳定版：v' + data.x64.version + ' （数据更新 ' + data.checked_at + '）';
 }
 
 // 先用嵌入数据渲染
 renderData(EMBEDDED_DATA);
 
-// 尝试通过 Google Update API 获取最新版（可能被 CORS 拦截，失败则用嵌入数据）
+// 尝试通过 Google Update API 实时获取各通道最新版（可能被 CORS 拦截，失败则用嵌入数据）
 function fetchLatest() {
-  var archs = ['x64', 'arm64'];
-  var pending = archs.length;
-  archs.forEach(function(arch) {
+  var pending = APPIDS.length;
+  var results = {};
+  APPIDS.forEach(function(t) {
     var xml = '<?xml version="1.0" encoding="UTF-8"?>' +
-      '<request protocol="3.0" version="1.3.36.155">' +
-      '<os version="10.0.22631" platform="win" sp="" arch="' + arch + '"/>' +
-      '<app appid="{8A69D345-D564-463C-AFF1-A69D9E530F96}" version="" nextversion="" lang="" brand="" client="" ap="' + arch + '-stable">' +
-      '<updatecheck target="" targetchannel=""/></app></request>';
+      '<request protocol="3.0" version="Chrome/155.0.8059.40" ismachine="1" installsource="ondemandcheckforupdate" dedup="cr">' +
+      '<os platform="win" version="10.0.19045" arch="' + t.osarch + '" sp=""/>' +
+      '<app appid="' + t.appid + '" ap="' + t.ap + '" version="" lang="zh-CN" brand="GCEA" installage="1">' +
+      '<updatecheck/></app></request>';
     fetch('https://update.googleapis.com/service/update2', {
       method: 'POST',
       headers: { 'Content-Type': 'application/xml' },
       body: xml
     }).then(function(r) { return r.text(); }).then(function(text) {
-      var ver = text.match(/<manifest version="([^"]+)"/);
-      var code = text.match(/<url codebase="(https:\/\/dl\.google\.com\/[^"]+)"/);
-      var pkg = text.match(/name="([^"]+\.exe)"/);
-      var size = text.match(/required="true" size="(\d+)"/);
-      if (ver && code && pkg) {
-        var dl = code[1] + pkg[1];
-        var sz = size ? (parseInt(size[1]) / 1048576).toFixed(0) + 'MB' : '?';
-        EMBEDDED_DATA[arch] = { version: ver[1], size: sz, downloadURL: dl };
-      }
+      var mVer = text.match(/<manifest version="([^"]+)"/);
+      var mName = text.match(/<package[^>]*name="([^"]+)"/);
+      var mSize = text.match(/<package[^>]*size="(\d+)"/);
+      var mSha = text.match(/hash_sha256="([^"]+)"/);
+      var mCb = text.match(/<url codebase="(https:\/\/[^"]+)"/);
+      if (!mVer || !mName || !mCb) return;
+      results[t.key] = {
+        key: t.key, channel: t.channel, arch: t.arch,
+        version: mVer[1],
+        size: (parseInt(mSize && mSize[1], 10) / 1048576).toFixed(0) + 'MB',
+        downloadURL: mCb[1] + mName[1],
+        sha256: (mSha && mSha[1]) ? mSha[1].toLowerCase() : '',
+        fileName: mName[1]
+      };
     }).catch(function() {}).finally(function() {
       pending--;
       if (pending === 0) {
-        EMBEDDED_DATA.checked_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
-        renderData(EMBEDDED_DATA);
+        var fresh = APPIDS.map(function(t) { return results[t.key]; }).filter(Boolean);
+        if (fresh.length > 0) {
+          // 合并：保留未被实时探测覆盖的条目（企业版MSI / Win7）
+          var old = (EMBEDDED_DATA && EMBEDDED_DATA.items) || [];
+          var keep = old.filter(function(o) { return !results[o.key]; });
+          EMBEDDED_DATA = { checked_at: new Date().toISOString(), items: keep.concat(fresh) };
+          renderData(EMBEDDED_DATA);
+        }
       }
     });
   });
