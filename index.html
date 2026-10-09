@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Google Chrome 离线安装包下载</title>
+<title>Google Chrome 官方离线安装包下载</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -11,29 +11,23 @@
     background: #10151f;
     color: #e0e0e0;
     min-height: 100vh;
-    padding: 16px;
+    padding: 18px;
   }
-  .container { max-width: 1200px; margin: 0 auto; }
+  .container { max-width: 1240px; margin: 0 auto; }
   h1 {
     text-align: center;
-    font-size: 1.5em;
-    margin-bottom: 6px;
+    font-size: 1.75em;
+    margin-bottom: 12px;
     background: linear-gradient(135deg, #ea4335, #fbbc04, #34a853, #4285f4);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .subtitle {
-    text-align: center;
-    color: #888;
-    font-size: 0.8em;
-    margin-bottom: 8px;
-  }
   .version-info {
     text-align: center;
     color: #4285f4;
-    font-size: 0.78em;
-    margin-bottom: 12px;
+    font-size: 0.92em;
+    margin-bottom: 16px;
     font-family: 'Consolas', 'Monaco', monospace;
   }
   .table-wrap {
@@ -42,19 +36,20 @@
     border-radius: 10px;
     overflow-x: auto;
   }
-  table { width: 100%; border-collapse: collapse; font-size: 0.76em; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92em; }
   thead th {
     background: #1b2a4d;
     color: #4285f4;
     text-align: left;
-    padding: 8px 10px;
-    font-weight: 600;
+    padding: 12px 14px;
+    font-size: 1.15em;
+    font-weight: 700;
     white-space: nowrap;
     position: sticky;
     top: 0;
   }
   tbody td {
-    padding: 7px 10px;
+    padding: 10px 14px;
     border-top: 1px solid #14203c;
     vertical-align: middle;
     white-space: nowrap;
@@ -62,9 +57,9 @@
   tbody tr:hover { background: #1a2b4d; }
   .ch-badge {
     display: inline-block;
-    padding: 2px 8px;
-    border-radius: 9px;
-    font-size: 0.9em;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.92em;
     background: #1e3a5f;
     color: #4285f4;
   }
@@ -74,53 +69,52 @@
   .ch-canary { background: #3b0d1e; color: #ff4d6d; }
   .ch-win7 { background: #1e2e3b; color: #8fb3d9; }
   .ch-enterprise { background: #2e1e3b; color: #b388ff; }
-  .arch { color: #aaa; font-family: 'Consolas', 'Monaco', monospace; }
+  .arch { color: #b8c4d0; font-family: 'Consolas', 'Monaco', monospace; }
   .ver { color: #fff; font-family: 'Consolas', 'Monaco', monospace; }
-  .size { color: #aaa; font-family: 'Consolas', 'Monaco', monospace; }
+  .size { color: #b8c4d0; font-family: 'Consolas', 'Monaco', monospace; }
+  .fname-cell { white-space: normal; }
   .fname { color: #c8d6e5; font-family: 'Consolas', 'Monaco', monospace; word-break: break-all; }
+  .sha-cell { white-space: normal; min-width: 320px; }
   .sha {
     font-family: 'Consolas', 'Monaco', monospace;
-    color: #9aa7b8;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    font-size: 0.85em;
+    color: #aeb9c6;
+    word-break: break-all;
+    display: inline-block;
   }
-  .sha .hash { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
   .copy-btn {
     background: none;
     border: 1px solid #1e3a5f;
     color: #888;
-    padding: 1px 6px;
-    border-radius: 4px;
+    padding: 2px 8px;
+    margin-left: 8px;
+    border-radius: 5px;
     cursor: pointer;
     font-size: 0.85em;
     transition: all 0.2s;
+    vertical-align: middle;
   }
   .copy-btn:hover { border-color: #4285f4; color: #4285f4; }
   .copy-btn.copied { border-color: #34a853; color: #34a853; }
-  .dl-link {
-    color: #4285f4;
-    text-decoration: none;
-    font-weight: 600;
-  }
+  .dl-link { color: #4285f4; text-decoration: none; font-weight: 600; }
   .dl-link:hover { text-decoration: underline; }
   .footer {
     text-align: center;
-    margin-top: 14px;
-    font-size: 0.74em;
-    color: #555;
+    margin-top: 18px;
+    font-size: 0.85em;
+    color: #666;
   }
   .footer a { color: #4285f4; text-decoration: none; }
   .toast {
     position: fixed;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     background: #1e3a5f;
     color: #4285f4;
-    padding: 8px 20px;
+    padding: 10px 24px;
     border-radius: 8px;
-    font-size: 0.85em;
+    font-size: 0.9em;
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
@@ -130,8 +124,7 @@
 </head>
 <body>
 <div class="container">
-  <h1>Google Chrome 离线安装包</h1>
-  <p class="subtitle">官方 Google Update API 直链 · 全通道完整离线安装包 · 支持 IDM 下载</p>
+  <h1>Google Chrome 官方离线安装包</h1>
   <p class="version-info" id="versionInfo">正在获取版本数据...</p>
 
   <div class="table-wrap">
@@ -159,9 +152,9 @@
 <div class="toast" id="toast">已复制到剪贴板</div>
 
 <script>
-// 嵌入兜底数据（由 GitHub Actions 定期更新，页面加载失败时使用）
+// 嵌入数据（由 GitHub Actions 每日通过 Google 官方 Update API 更新，wrangler 部署，不依赖任何第三方仓库）
 var EMBEDDED_DATA = {
-  "checked_at": "2026-10-09T06:35:02Z",
+  "checked_at": "2026-10-09T06:48:54Z",
   "items": [
     {
       "version": "155.0.8059.40",
@@ -302,20 +295,6 @@ function chClass(channel) {
   return m[channel] || 'ch-badge';
 }
 
-// 前端实时探测列表（Google Update XML，与后端 update_embedded.py 保持一致）
-// canary 使用独立 appguid；arm64 仅 stable 通道有官方构建
-var APPIDS = [
-  { key: 'stable-x64',   appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x64-stable',   channel: '稳定版', arch: 'x64'   },
-  { key: 'stable-x86',   appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x86-stable',   channel: '稳定版', arch: 'x86'   },
-  { key: 'stable-arm64', appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'arm64', ap: 'arm64-stable', channel: '稳定版', arch: 'arm64' },
-  { key: 'beta-x64',     appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x64-beta',     channel: 'Beta',     arch: 'x64'   },
-  { key: 'beta-x86',     appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x86-beta',     channel: 'Beta',     arch: 'x86'   },
-  { key: 'dev-x64',      appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x64-dev',      channel: 'Dev',      arch: 'x64'   },
-  { key: 'dev-x86',      appid: '{8A69D345-D564-463C-AFF1-A69D9E530F96}', osarch: 'x64',   ap: 'x86-dev',      channel: 'Dev',      arch: 'x86'   },
-  { key: 'canary-x64',   appid: '{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}', osarch: 'x64',   ap: 'x64-canary',   channel: 'Canary',   arch: 'x64'   },
-  { key: 'canary-x86',   appid: '{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}', osarch: 'x64',   ap: 'x86-canary',   channel: 'Canary',   arch: 'x86'   }
-];
-
 function copyText(id, btn) {
   var el = document.getElementById(id);
   if (!el || !el.dataset.sha) return;
@@ -348,7 +327,7 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 
-// UTC-4 显示（固定偏移，对应美东夏令时）
+// 检测更新日期（UTC-4 固定偏移）
 function fmtUTC4(isoStr) {
   var t = new Date(isoStr);
   if (isNaN(t.getTime())) return isoStr;
@@ -366,80 +345,28 @@ function renderData(data) {
     var shaVal = item.sha256 || '';
     var shaCell;
     if (shaVal) {
-      var shaShort = shaVal.slice(0, 16) + '…';
-      shaCell = '<span class="sha"><span class="hash" id="' + shaId + '" data-sha="' + shaVal + '" title="' + shaVal + '">' + shaShort + '</span>' +
-        '<button class="copy-btn" onclick="copyText(\'' + shaId + '\', this)">复制</button></span>';
+      shaCell = '<td class="sha-cell"><span class="sha" id="' + shaId + '" data-sha="' + shaVal + '">' + shaVal + '</span>' +
+        '<button class="copy-btn" onclick="copyText(\'' + shaId + '\', this)">复制</button></td>';
     } else {
-      shaCell = '<span class="sha" style="color:#555">-</span>';
+      shaCell = '<td class="sha-cell"><span class="sha" style="color:#555">-</span></td>';
     }
     tr.innerHTML =
       '<td><span class="ch-badge ' + chClass(item.channel) + '">' + item.channel + '</span></td>' +
       '<td class="arch">' + item.arch + '</td>' +
       '<td class="ver">' + item.version + '</td>' +
       '<td class="size">' + item.size + '</td>' +
-      '<td class="fname">' + item.fileName + '</td>' +
-      '<td>' + shaCell + '</td>' +
-      '<td><a class="dl-link" href="' + item.downloadURL + '" target="_blank" rel="noopener">下载 ↓</a></td>';
+      '<td class="fname-cell"><span class="fname">' + item.fileName + '</span></td>';
+    tr.innerHTML += shaCell;
+    tr.innerHTML += '<td><a class="dl-link" href="' + item.downloadURL + '" target="_blank" rel="noopener">下载 ↓</a></td>';
     body.appendChild(tr);
   });
   if (data && data.checked_at) {
-    document.getElementById('versionInfo').textContent = '数据更新：' + fmtUTC4(data.checked_at) + ' · 共 ' + items.length + ' 个版本';
+    document.getElementById('versionInfo').textContent = '检测更新日期：' + fmtUTC4(data.checked_at);
   }
 }
 
-// 先用嵌入数据渲染
+// 渲染嵌入数据（权威来源，每日自动更新）
 renderData(EMBEDDED_DATA);
-
-// 尝试通过 Google Update API 实时获取各通道最新版（可能被 CORS 拦截，失败则用嵌入数据）
-function fetchLatest() {
-  var pending = APPIDS.length;
-  var results = {};
-  APPIDS.forEach(function(t) {
-    var xml = '<?xml version="1.0" encoding="UTF-8"?>' +
-      '<request protocol="3.0" version="Chrome/155.0.8059.40" ismachine="1" installsource="ondemandcheckforupdate" dedup="cr">' +
-      '<os platform="win" version="10.0.19045" arch="' + t.osarch + '" sp=""/>' +
-      '<app appid="' + t.appid + '" ap="' + t.ap + '" version="" lang="zh-CN" brand="GCEA" installage="1">' +
-      '<updatecheck/></app></request>';
-    fetch('https://update.googleapis.com/service/update2', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/xml' },
-      body: xml
-    }).then(function(r) { return r.text(); }).then(function(text) {
-      var mVer = text.match(/<manifest version="([^"]+)"/);
-      var mName = text.match(/<package[^>]*name="([^"]+)"/);
-      var mSize = text.match(/<package[^>]*size="(\d+)"/);
-      var mSha = text.match(/hash_sha256="([^"]+)"/);
-      var mCb = text.match(/<url codebase="(https:\/\/[^"]+)"/);
-      if (!mVer || !mName || !mCb) return;
-      results[t.key] = {
-        key: t.key, channel: t.channel, arch: t.arch,
-        version: mVer[1],
-        size: (parseInt(mSize && mSize[1], 10) / 1048576).toFixed(0) + 'MB',
-        downloadURL: mCb[1] + mName[1],
-        sha256: (mSha && mSha[1]) ? mSha[1].toLowerCase() : '',
-        fileName: mName[1]
-      };
-    }).catch(function() {}).finally(function() {
-      pending--;
-      if (pending === 0) {
-        var fresh = APPIDS.map(function(t) { return results[t.key]; }).filter(Boolean);
-        if (fresh.length > 0) {
-          // 合并：保留未被实时探测覆盖的条目（企业版MSI / Win7）
-          var old = (EMBEDDED_DATA && EMBEDDED_DATA.items) || [];
-          var keep = old.filter(function(o) { return !results[o.key]; });
-          EMBEDDED_DATA = { checked_at: new Date().toISOString(), items: keep.concat(fresh) };
-          renderData(EMBEDDED_DATA);
-        }
-      }
-    });
-  });
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', fetchLatest);
-} else {
-  fetchLatest();
-}
 </script>
 </body>
 </html>
