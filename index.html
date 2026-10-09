@@ -154,7 +154,7 @@
 <script>
 // 嵌入数据（由 GitHub Actions 每日通过 Google 官方 Update API 更新，wrangler 部署，不依赖任何第三方仓库）
 var EMBEDDED_DATA = {
-  "checked_at": "2026-10-09T07:08:54Z",
+  "checked_at": "2026-10-09T07:15:32Z",
   "items": [
     {
       "version": "155.0.8059.40",
@@ -327,11 +327,11 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 
-// 检测更新日期（UTC-4 固定偏移）
+// 最后检测更新时间（UTC-4 固定偏移，带秒）
 function fmtUTC4(isoStr) {
   var t = new Date(isoStr);
   if (isNaN(t.getTime())) return isoStr;
-  var s = new Date(t.getTime() - 4 * 3600 * 1000).toISOString().slice(0, 16).replace('T', ' ');
+  var s = new Date(t.getTime() - 4 * 3600 * 1000).toISOString().slice(0, 19).replace('T', ' ');
   return s + ' (UTC-4)';
 }
 
@@ -361,7 +361,7 @@ function renderData(data) {
     body.appendChild(tr);
   });
   if (data && data.checked_at) {
-    document.getElementById('versionInfo').textContent = '检测更新日期：' + fmtUTC4(data.checked_at);
+    document.getElementById('versionInfo').textContent = '最后检测更新时间 ' + fmtUTC4(data.checked_at);
   }
 }
 

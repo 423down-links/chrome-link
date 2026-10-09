@@ -2,8 +2,8 @@ name: Update Chrome Version
 
 on:
   schedule:
-    # 北京时间每天凌晨 5:00（UTC 前一天 21:00）
-    - cron: '0 21 * * *'
+    # 目标北京时间每天凌晨 5:00（UTC 21:00）；GitHub Actions 调度普遍延迟约 15 分钟，故 cron 提前到 UTC 20:45
+    - cron: '45 20 * * *'
   workflow_dispatch:
 
 permissions:
