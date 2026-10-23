@@ -386,12 +386,12 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 
-// 最后检测更新时间（UTC-4 固定偏移，带秒）
-function fmtUTC4(isoStr) {
+// 最后检测更新时间（北京时间 UTC+8，带秒）
+function fmtBeijing(isoStr) {
   var t = new Date(isoStr);
   if (isNaN(t.getTime())) return isoStr;
-  var s = new Date(t.getTime() - 4 * 3600 * 1000).toISOString().slice(0, 19).replace('T', ' ');
-  return s + ' (UTC-4)';
+  var s = new Date(t.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 19).replace('T', ' ');
+  return s + ' (北京时间)';
 }
 
 function renderData(data) {
@@ -424,7 +424,7 @@ function renderData(data) {
     .filter(Boolean).sort();
   var latest = published.length ? published[published.length - 1] : data.checked_at;
   if (latest) {
-    document.getElementById('versionInfo').textContent = '最后检测更新时间 ' + fmtUTC4(latest);
+    document.getElementById('versionInfo').textContent = '最后检测更新时间 ' + fmtBeijing(latest);
   }
 }
 
