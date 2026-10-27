@@ -386,7 +386,7 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 
-// 最后检测更新时间（北京时间 UTC+8，带秒）
+// 稳定版官方发布时间（北京时间 UTC+8，带秒）
 function fmtBeijing(isoStr) {
   var t = new Date(isoStr);
   if (isNaN(t.getTime())) return isoStr;
@@ -419,12 +419,14 @@ function renderData(data) {
     tr.innerHTML += '<td><a class="dl-link" href="' + item.downloadURL + '" target="_blank" rel="noopener">下载 ↓</a></td>';
     body.appendChild(tr);
   });
-  // 顶部时间取所有版本中最新的“官方发布时间”，不是工作流运行时间；无官方时间时回退 checked_at
-  var published = (data.items || []).map(function (i) { return i.published || ''; })
+  // 顶部时间只取「稳定版」（stable-*）里最新的官方发布时间，不是工作流运行时间；
+  // 稳定版没拿到官方时间时才回退 checked_at（避免被 Canary/Beta 的日更带跑）
+  var published = (data.items || []).filter(function (i) { return /^stable-/.test(i.key || ''); })
+    .map(function (i) { return i.published || ''; })
     .filter(Boolean).sort();
   var latest = published.length ? published[published.length - 1] : data.checked_at;
   if (latest) {
-    document.getElementById('versionInfo').textContent = '最后检测更新时间 ' + fmtBeijing(latest);
+    document.getElementById('versionInfo').textContent = '稳定版官方发布时间 ' + fmtBeijing(latest);
   }
 }
 
