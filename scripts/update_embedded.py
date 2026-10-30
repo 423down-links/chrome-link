@@ -168,8 +168,9 @@ VH_CHANNEL = {"稳定版": "stable", "Beta": "beta", "Dev": "dev", "Canary": "ca
 
 
 def versionhistory_published(channel: str, arch: str, version: str) -> str:
-    """Chrome 官方 Version History API：取该版本 eventTime（GitHub Actions 完整公网可达）。
-    本地沙箱代理白名单外会超时，由调用方回退 Last-Modified。"""
+    """Chrome 官方 Version History API：取该版本的 startTime（官方发布/开始推送时间）。
+    同一版本会因分批放量出现多条记录，取最早的 startTime 才是真正的发布时刻；
+    失败时由调用方回退 Last-Modified（那是文件上传时间，可能早于发布，仅作兜底）。"""
     if os.environ.get("SKIP_VH"):  # 本地沙箱代理白名单外，跳过（GitHub Actions 不设此变量）
         return ""
     plat = VH_PLATFORM.get(arch)
@@ -182,15 +183,26 @@ def versionhistory_published(channel: str, arch: str, version: str) -> str:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=25) as r:
             data = json.loads(r.read().decode())
+        best = ""
         for rel in data.get("releases", []):
-            if rel.get("version") == version:
-                ev = rel.get("eventTime")
-                if ev and not ev.endswith("Z"):
-                    ev += "Z"
-                return ev
+            if rel.get("version") != version:
+                continue
+            st = rel.get("startTime") or rel.get("eventTime") or ""
+            if not st:
+                continue
+            st = st.replace("Z", "+00:00").replace("z", "+00:00")
+            try:
+                dt = datetime.fromisoformat(st)
+            except Exception:
+                continue
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            iso = dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            if not best or iso < best:  # 最早的 startTime = 真正发布时刻
+                best = iso
+        return best
     except Exception:
         return ""
-    return ""
 
 
 def main():
