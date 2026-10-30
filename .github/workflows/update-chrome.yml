@@ -24,10 +24,12 @@ jobs:
           python-version: '3.12'
 
       - name: Run update script
+        if: github.event_name != 'push'
         run: python3 scripts/update_embedded.py
 
       - name: Commit and push if changed
         id: commit
+        if: github.event_name != 'push'
         run: |
           git config user.name "423down"
           git config user.email "zd423@qq.com"
@@ -35,7 +37,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "无版本更新，跳过推送"
           else
-            git commit -m "chore: update Chrome version $(date +%F) [skip ci]"
+            git commit -m "chore: update Chrome version $(date +%F)"
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
