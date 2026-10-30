@@ -163,44 +163,28 @@ def head_last_modified(url: str) -> str:
     return ""
 
 
-VH_PLATFORM = {"x64": "win64", "x86": "win", "arm64": "winarm64"}
-VH_CHANNEL = {"稳定版": "stable", "Beta": "beta", "Dev": "dev", "Canary": "canary"}
+DASH_CHANNEL = {"稳定版": "Stable", "Beta": "Beta", "Dev": "Dev", "Canary": "Canary"}
 
 
-def versionhistory_published(channel: str, arch: str, version: str) -> str:
-    """Chrome 官方 Version History API：取该版本的 startTime（官方发布/开始推送时间）。
-    同一版本会因分批放量出现多条记录，取最早的 startTime 才是真正的发布时刻；
-    失败时由调用方回退 Last-Modified（那是文件上传时间，可能早于发布，仅作兜底）。"""
+def release_published(channel: str, arch: str, version: str) -> str:
+    """ChromiumDash 官方发布记录（fetch_releases）：time 字段为官方发布时间（毫秒时间戳）。
+    同一版本分批放量会出现多条，取最早的一条才是真正的发布时刻；
+    接口失败时由调用方回退 Last-Modified（那只是文件上传时间，可能早于发布，仅兜底）。"""
     if os.environ.get("SKIP_VH"):  # 本地沙箱代理白名单外，跳过（GitHub Actions 不设此变量）
         return ""
-    plat = VH_PLATFORM.get(arch)
-    ch = VH_CHANNEL.get(channel)
-    if not plat or not ch:
+    ch = DASH_CHANNEL.get(channel)
+    if not ch:
         return ""
-    url = (f"https://versionhistory.googleapis.com/v1/chrome/platforms/{plat}/channels/{ch}"
-           f"/releases?order_by=starttime%20desc&page_size=15")
+    url = f"https://chromiumdash.appspot.com/fetch_releases?channel={ch}&platform=Windows&num=30"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=25) as r:
             data = json.loads(r.read().decode())
-        best = ""
-        for rel in data.get("releases", []):
-            if rel.get("version") != version:
-                continue
-            st = rel.get("startTime") or rel.get("eventTime") or ""
-            if not st:
-                continue
-            st = st.replace("Z", "+00:00").replace("z", "+00:00")
-            try:
-                dt = datetime.fromisoformat(st)
-            except Exception:
-                continue
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=timezone.utc)
-            iso = dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-            if not best or iso < best:  # 最早的 startTime = 真正发布时刻
-                best = iso
-        return best
+        times = [int(x["time"]) for x in data
+                 if x.get("version") == version and x.get("time")]
+        if not times:
+            return ""
+        return datetime.fromtimestamp(min(times) / 1000, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     except Exception:
         return ""
 
@@ -227,8 +211,8 @@ def main():
             info["key"] = key
             info["channel"] = label
             info["arch"] = arch
-            # 官方发布时间：Version History 优先，失败回退文件 Last-Modified
-            info["published"] = versionhistory_published(label, arch, info["version"]) \
+            # 官方发布时间：ChromiumDash 发布记录优先，失败回退文件 Last-Modified
+            info["published"] = release_published(label, arch, info["version"]) \
                 or head_last_modified(info["downloadURL"])
             items.append(info)
             print(f"{key:14s} v{info['version']:18s} {info['size']:6s} pub={info['published']}")
@@ -249,7 +233,7 @@ def main():
             size = f"{nbytes / 1048576:.0f}MB"
             print(f"{t['key']:14s} v{stable_version:18s} {size:6s} SHA自动计算 {sha[:12]}")
         # 企业版随 stable 发布：用 stable 官方时间，失败回退 Last-Modified
-        pub = versionhistory_published("稳定版", t["arch"], stable_version) \
+        pub = release_published("稳定版", t["arch"], stable_version) \
             or head_last_modified(t["downloadURL"])
         items.append({**t, "channel": "企业版MSI", "version": stable_version,
                       "size": size, "sha256": sha, "published": pub})
